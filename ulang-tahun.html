@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Happy Birthday Adel Zahra!</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: linear-gradient(45deg, #000000, #434343);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        .birthday-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+        .birthday-message h1 {
+            font-size: 4rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        .birthday-message p {
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+        #canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #ff4da6, 0 0 30px #ff4da6; }
+            to { text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="birthday-message">
+        <h1>Happy Birthday Adel Zahra!</h1>
+        <p>Semoga di umur 20 semakin lancar rezekinya, dipermudah segala urusannya, lancar terus kuliahnya, dan semoga segala doa yang kamu panjatkan segera dikabulkan ❤️</p>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Firework {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.speed = Math.random() * 3 + 2;
+                this.radius = Math.random() * 3 + 2;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.particles = [];
+            }
+
+            launch() {
+                this.y -= this.speed;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            explode() {
+                for(let i = 0; i < 50; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5;
+                    this.particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: this.color,
+                        alpha: 1
+                    });
+                }
+            }
+
+            updateParticles() {
+                this.particles = this.particles.filter(p => p.alpha > 0);
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1;
+                    p.alpha -= 0.02;
+                    
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = `${p.color}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`;
+                    ctx.fill();
+                });
+            }
+        }
+
+        const fireworks = Array.from({length: 10}, () => new Firework());
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            fireworks.forEach(firework => {
+                if(firework.y < canvas.height / 2) {
+                    firework.explode();
+                    firework.reset();
+                }
+                firework.launch();
+                firework.updateParticles();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
